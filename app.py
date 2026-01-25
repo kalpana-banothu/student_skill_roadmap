@@ -18,7 +18,7 @@
 # st.title("🎓 Personalized Student Skill Roadmap Web App")
 # st.write("Interactive web application to guide students in planning their skills, career, and personal development.")
 
-st.divider()
+# st.divider()
 
 # --- User Input ---
 # st.header("📋 Enter Your Details")
@@ -498,6 +498,7 @@ with st.expander("📊 Sample Student Dataset (Preview)", expanded=False):
     st.dataframe(data, use_container_width=True)
 
 st.caption("Mini Project | Student Skill Roadmap | Streamlit Web App")
+
 
 
 
