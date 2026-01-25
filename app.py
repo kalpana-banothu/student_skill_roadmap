@@ -322,49 +322,117 @@ def generate_structured_roadmap(info, df):
         "projects": projects,
     }
 
+# def roadmap_to_markdown(name, info, roadmap):
+#     lines = []
+#     lines.append(f"# Personalized Roadmap for {name or 'Student'}")
+#     lines.append(f"**Generated on:** {date.today().isoformat()}")
+#     lines.append("")
+#     lines.append("## Profile")
+#     for k in ["year", "branch", "interest", "skill_level", "budget", "hostel", "study_hours", "gpa", "stress_level", "confusion_level", "communication", "family_support"]:
+#         lines.append(f"- **{k.replace('_',' ').title()}**: {info.get(k)}")
+#     lines.append("")
+#     lines.append("## Data Insight")
+#     lines.append(roadmap["similar_note"])
+#     lines.append("")
+#     lines.append("## Goals")
+#     for g in roadmap["goals"]:
+#         lines.append(f"- {g}")
+#     lines.append("")
+#     if roadmap["risks"]:
+#         lines.append("## Risks to Watch")
+#         for r in roadmap["risks"]:
+#             lines.append(f"- {r}")
+#         lines.append("")
+#     lines.append("## Daily Habits")
+#     for h in roadmap["habits"]:
+#         lines.append(f"- {h}")
+#     lines.append("")
+#     lines.append("## Action Steps")
+#     for s in roadmap["steps"]:
+#         lines.append(f"- {s}")
+#     lines.append("")
+#     lines.append("## 4-Week Plan")
+#     for w in roadmap["week_plan"]:
+#         lines.append(f"### {w['title']}")
+#         for b in w["bullets"]:
+#             lines.append(f"- {b}")
+#         lines.append("")
+#     lines.append("## Suggested Projects")
+#     for p in roadmap["projects"]:
+#         lines.append(f"- {p}")
+#     lines.append("")
+#     lines.append("## Resources")
+#     for r in roadmap["resources"]:
+#         lines.append(f"- {r}")
+#     lines.append("")
+#     return "\n".join(lines)
 def roadmap_to_markdown(name, info, roadmap):
+    def s(x):
+        # Convert anything (including numpy types) to clean string
+        try:
+            if pd.isna(x):
+                return ""
+        except Exception:
+            pass
+        return str(x)
+
     lines = []
-    lines.append(f"# Personalized Roadmap for {name or 'Student'}")
+    lines.append(f"# Personalized Roadmap for {s(name) or 'Student'}")
     lines.append(f"**Generated on:** {date.today().isoformat()}")
     lines.append("")
     lines.append("## Profile")
-    for k in ["year", "branch", "interest", "skill_level", "budget", "hostel", "study_hours", "gpa", "stress_level", "confusion_level", "communication", "family_support"]:
-        lines.append(f"- **{k.replace('_',' ').title()}**: {info.get(k)}")
+
+    keys = [
+        "year", "branch", "interest", "skill_level", "budget", "hostel",
+        "study_hours", "gpa", "stress_level", "confusion_level",
+        "communication", "family_support"
+    ]
+    for k in keys:
+        lines.append(f"- **{k.replace('_',' ').title()}**: {s(info.get(k))}")
+
     lines.append("")
     lines.append("## Data Insight")
-    lines.append(roadmap["similar_note"])
+    lines.append(s(roadmap.get("similar_note", "")))
     lines.append("")
     lines.append("## Goals")
-    for g in roadmap["goals"]:
-        lines.append(f"- {g}")
+    for g in roadmap.get("goals", []):
+        lines.append(f"- {s(g)}")
+
     lines.append("")
-    if roadmap["risks"]:
+    risks = roadmap.get("risks", [])
+    if risks:
         lines.append("## Risks to Watch")
-        for r in roadmap["risks"]:
-            lines.append(f"- {r}")
+        for r in risks:
+            lines.append(f"- {s(r)}")
         lines.append("")
+
     lines.append("## Daily Habits")
-    for h in roadmap["habits"]:
-        lines.append(f"- {h}")
+    for h in roadmap.get("habits", []):
+        lines.append(f"- {s(h)}")
     lines.append("")
+
     lines.append("## Action Steps")
-    for s in roadmap["steps"]:
-        lines.append(f"- {s}")
+    for step in roadmap.get("steps", []):
+        lines.append(f"- {s(step)}")
     lines.append("")
+
     lines.append("## 4-Week Plan")
-    for w in roadmap["week_plan"]:
-        lines.append(f"### {w['title']}")
-        for b in w["bullets"]:
-            lines.append(f"- {b}")
+    for w in roadmap.get("week_plan", []):
+        lines.append(f"### {s(w.get('title',''))}")
+        for b in w.get("bullets", []):
+            lines.append(f"- {s(b)}")
         lines.append("")
+
     lines.append("## Suggested Projects")
-    for p in roadmap["projects"]:
-        lines.append(f"- {p}")
+    for p in roadmap.get("projects", []):
+        lines.append(f"- {s(p)}")
     lines.append("")
+
     lines.append("## Resources")
-    for r in roadmap["resources"]:
-        lines.append(f"- {r}")
+    for r in roadmap.get("resources", []):
+        lines.append(f"- {s(r)}")
     lines.append("")
+
     return "\n".join(lines)
 
 # ---------------- UI ----------------
@@ -498,6 +566,7 @@ with st.expander("📊 Sample Student Dataset (Preview)", expanded=False):
     st.dataframe(data, use_container_width=True)
 
 st.caption("Mini Project | Student Skill Roadmap | Streamlit Web App")
+
 
 
 
