@@ -34,7 +34,6 @@ def get_similar_students(df, info):
     return f
 
 def build_week_plan(interest, skill_level, budget_level):
-    """A structured 4-week roadmap (generic but clean)."""
     free_note = "Use free resources (YouTube/NPTEL/free Coursera audits)." if budget_level=="Low" else "Consider 1 paid course + mentorship for speed."
     if skill_level=="Beginner":
         project = "Mini project: build a basic end-to-end demo"
@@ -52,20 +51,26 @@ def build_week_plan(interest, skill_level, budget_level):
 def generate_structured_roadmap(info, df):
     """Return a rich roadmap object (not just flat strings)."""
     steps, risks, habits, goals = [], [], [], []
+
     sim = get_similar_students(df, info)
     sim_note = None
-    if len(sim) >= 5:
+    if len(sim) >= 1:
         avg_gpa = sim["gpa"].mean() if "gpa" in sim.columns else None
         avg_study = sim["study_hours"].mean() if "study_hours" in sim.columns else None
-        if avg_gpa is not None and avg_study is not None:
-            sim_note = f"Based on **{len(sim)} similar students** (same year/branch/interest/skill), average GPA is **{avg_gpa:.2f}** and average study hours is **{avg_study:.1f}/day**."
-        else:
-            sim_note = f"Not enough similar-student rows for strong stats (found {len(sim)}). Using rule-based roadmap."
+        sim_note = f"Based on **{len(sim)} similar students**:"
+        if avg_gpa is not None:
+            sim_note += f" average GPA is **{avg_gpa:.2f}**"
+        if avg_study is not None:
+            sim_note += f" and average study hours is **{avg_study:.1f}/day**."
+    else:
+        sim_note = "No similar students found. Using rule-based roadmap."
+
     # Core goals
     goals.append(f"Build a clear learning path in **{info['interest']}**.")
     if info["gpa"] < 6.0: goals.append("Improve academic consistency (target +0.5 GPA next semester).")
     if info["study_hours"] < 3: goals.append("Increase study hours gradually to a sustainable level.")
     if info["communication"] in ("Poor","Low"): goals.append("Improve communication through weekly speaking/writing practice.")
+
     # Risks & Habits
     if info["stress_level"]=="High" or info["confusion_level"]=="High":
         risks.append("High stress/confusion can reduce consistency → use weekly planning + short focused sessions.")
@@ -88,7 +93,9 @@ def generate_structured_roadmap(info, df):
         steps.append("Academics: revise daily + weekly tests + focus on weak subjects.")
     if info["communication"] in ("Poor","Low"):
         steps.append("Communication: 2 short talks/week + write 1 summary/day (5–7 lines).")
+
     week_plan = build_week_plan(info["interest"], info["skill_level"], info["budget"])
+
     # Resources by interest
     interest_lower = str(info["interest"]).lower()
     if "data" in interest_lower or "ml" in interest_lower or "ai" in interest_lower:
@@ -100,6 +107,7 @@ def generate_structured_roadmap(info, df):
     else:
         resources = ["YouTube + NPTEL fundamentals","One structured course (beginner → intermediate)","Build 2–3 projects + document well"]
         projects = ["1 mini project","1 intermediate project","1 portfolio-grade project"]
+
     return {"similar_note": sim_note,"goals": goals,"risks": risks,"habits": habits,"steps": steps,"week_plan": week_plan,"resources": resources,"projects": projects}
 
 # ---------------- Skill Analysis ----------------
@@ -164,7 +172,6 @@ def roadmap_to_markdown(name, info, roadmap):
             lines.append(f"## {section}")
             for i in items: lines.append(f"- {s(i)}")
             lines.append("")
-    # 4-Week plan
     lines.append("## 4-Week Plan")
     for w in roadmap.get("week_plan", []):
         lines.append(f"### {s(w.get('title',''))}")
@@ -203,7 +210,7 @@ budget = st.selectbox("Budget Level", budgets)
 skill_level = st.selectbox("Skill Level", skill_levels)
 stress_level = st.selectbox("Stress Level", stress_levels)
 confusion_level = st.selectbox("Confusion Level", conf_levels)
-communication_level = st.selectbox("Communication Level", comm_levels)  # <- consistent name
+communication = st.selectbox("Communication Level", comm_levels)
 st.divider()
 
 # -------- Generate Roadmap --------
@@ -213,7 +220,7 @@ if st.button("🔍 Generate My Roadmap"):
         "failures": int(failures),"hostel": hostel,"sleep_hours": int(sleep_hours),
         "family_support": family_support,"interest": interest,"budget": budget,
         "skill_level": skill_level,"stress_level": stress_level,"confusion_level": confusion_level,
-        "communication": communication_level  # <- consistent key
+        "communication": communication
     }
     roadmap = generate_structured_roadmap(student_info, data)
     st.success(f"✅ Roadmap Generated for {name or 'Student'}")
@@ -229,7 +236,7 @@ if st.button("🔍 Generate My Roadmap"):
     readiness += 25 if study_hours>=4 else 15 if study_hours>=3 else 8
     readiness += 20 if stress_level!="High" else 8
     readiness += 15 if confusion_level!="High" else 8
-    readiness += 10 if communication_level in ("Average","Good") else 5
+    readiness += 10 if communication in ("Average","Good") else 5
     readiness = min(readiness,100)
     st.write("### 📈 Readiness Score")
     st.progress(readiness/100)
