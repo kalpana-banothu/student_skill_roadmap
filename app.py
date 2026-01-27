@@ -12,95 +12,121 @@ def load_data():
 
 data = load_data()
 
-# ---------------- Skill Maps ----------------
-SKILL_MAP = {
+# ---------------- Helpers ----------------
+def safe_unique(df, col, fallback):
+    return sorted(df[col].dropna().unique()) if col in df.columns else fallback
+
+# ---------------- Roadmap Logic ----------------
+def generate_roadmap(info):
+    steps = []
+
+    if info['skill_level'] == "Beginner":
+        steps.append("Start with basics and practice small projects.")
+    else:
+        steps.append("Focus on advanced projects and real-world applications.")
+
+    if info['study_hours'] < 3 or info['gpa'] < 6.0:
+        steps.append("Increase study hours and follow a structured schedule.")
+
+    if info['stress_level'] == "High":
+        steps.append("Adopt stress management techniques and time planning.")
+
+    if info['communication'] == "Poor":
+        steps.append("Improve communication via speaking and writing practice.")
+
+    if info['budget'] == "Low":
+        steps.append("Use free learning platforms and open resources.")
+    else:
+        steps.append("Consider paid courses for faster progress.")
+
+    steps.append(f"Focus learning on your interest: {info['interest']}.")
+
+    return steps
+
+# ---------------- ADDITIONAL FEATURE ----------------
+# -------- Job-based Skill Analysis Data --------
+JOB_SKILL_ANALYSIS = {
     "Software Developer": {
-        "Programming Languages": ["Python", "Java", "C++"],
-        "Data Structures & Algorithms": ["Arrays", "Linked Lists", "Stacks", "Queues", "Trees", "Graphs"],
-        "Web Basics": ["HTML", "CSS", "JavaScript"],
-        "Backend Development": ["APIs", "Databases (SQL)", "Authentication"],
-        "Tools": ["Git", "GitHub", "VS Code"],
-        "CS Fundamentals": ["OOPS", "DBMS", "OS Basics", "Computer Networks"],
-        "Career Skills": ["Problem Solving", "Debugging", "Communication"]
+        "skills": [
+            "Python / Java",
+            "Data Structures & Algorithms",
+            "HTML, CSS, JavaScript",
+            "Git & GitHub",
+            "Databases (SQL)",
+            "OOPS",
+            "Problem Solving"
+        ],
+        "projects": [
+            "Student Management System",
+            "Task Tracker Application",
+            "Portfolio Website",
+            "REST API Mini Project"
+        ],
+        "resources": [
+            "NPTEL – Programming & DSA",
+            "YouTube – freeCodeCamp",
+            "GeeksForGeeks – DSA",
+            "GitHub – Open Source Projects"
+        ]
     },
 
-    "Data Science": {
-        "Programming": ["Python"],
-        "Math": ["Statistics", "Probability", "Linear Algebra"],
-        "Data Analysis": ["Pandas", "NumPy", "EDA"],
-        "Visualization": ["Matplotlib", "Seaborn"],
-        "Machine Learning": ["Regression", "Classification", "Clustering"],
-        "Tools": ["Jupyter", "Git", "Kaggle"]
+    "Frontend Developer": {
+        "skills": [
+            "HTML",
+            "CSS",
+            "JavaScript",
+            "React",
+            "Responsive Design",
+            "Git & GitHub"
+        ],
+        "projects": [
+            "Portfolio Website",
+            "React To-Do App",
+            "UI Clone (Netflix / Amazon)"
+        ],
+        "resources": [
+            "MDN Web Docs",
+            "Traversy Media (YouTube)",
+            "React Official Docs"
+        ]
     },
 
-    "Web Developer": {
-        "Frontend": ["HTML", "CSS", "JavaScript"],
-        "Frameworks": ["React"],
-        "Backend": ["Node.js", "Django", "Flask"],
-        "Database": ["MySQL", "MongoDB"],
-        "Deployment": ["GitHub", "Netlify", "Vercel"]
+    "Data Scientist": {
+        "skills": [
+            "Python",
+            "Statistics",
+            "Pandas & NumPy",
+            "Data Visualization",
+            "Machine Learning Basics"
+        ],
+        "projects": [
+            "Student Performance Analysis",
+            "Sales Prediction Model",
+            "EDA Project"
+        ],
+        "resources": [
+            "Kaggle Learn",
+            "Krish Naik (YouTube)",
+            "Coursera ML (Audit Mode)"
+        ]
     }
 }
 
-# ---------------- Skill Gap Logic ----------------
-def skill_gap_analysis(interest, known_skills):
-    required = SKILL_MAP.get(interest, {})
-    completed, gaps = {}, {}
+def compute_skill_gap(required_skills, known_skills):
+    known = []
+    missing = []
 
-    for category, skills in required.items():
-        done, missing = [], []
-        for s in skills:
-            if any(s.lower() in k.lower() for k in known_skills):
-                done.append(s)
-            else:
-                missing.append(s)
-        if done:
-            completed[category] = done
-        if missing:
-            gaps[category] = missing
+    for s in required_skills:
+        if s in known_skills:
+            known.append(s)
+        else:
+            missing.append(s)
 
-    return completed, gaps
-
-# ---------------- Roadmap Helpers ----------------
-def build_week_plan(interest):
-    return [
-        {
-            "title": "Week 1 – Fundamentals",
-            "points": [
-                f"Understand core basics of {interest}",
-                "Set up tools & environment",
-                "Study 1–2 hours daily"
-            ]
-        },
-        {
-            "title": "Week 2 – Skill Practice",
-            "points": [
-                "Practice coding / exercises",
-                "Start a mini project",
-                "Learn Git & GitHub"
-            ]
-        },
-        {
-            "title": "Week 3 – Projects",
-            "points": [
-                "Complete 1 meaningful project",
-                "Improve code quality",
-                "Document work on GitHub"
-            ]
-        },
-        {
-            "title": "Week 4 – Career Prep",
-            "points": [
-                "Resume update",
-                "Mock interviews",
-                "Plan next learning goals"
-            ]
-        }
-    ]
+    return known, missing
 
 # ---------------- UI ----------------
 st.title("🎓 Personalized Student Skill Roadmap")
-st.caption("Career-focused learning with Skill Gap Analysis")
+st.caption("Main roadmap system with additional Skill Analysis option")
 st.divider()
 
 # ---------------- Inputs ----------------
@@ -116,111 +142,100 @@ stress = st.selectbox("Stress Level", ["Low", "Medium", "High"])
 confusion = st.selectbox("Confusion Level", ["Low", "Medium", "High"])
 communication = st.selectbox("Communication Skill", ["Poor", "Average", "Good"])
 budget = st.selectbox("Budget", ["Low", "Medium", "High"])
-
-interest = st.selectbox(
-    "Career Interest",
-    list(SKILL_MAP.keys())
-)
-
-st.subheader("🛠️ Skills You Already Know")
-known_skills = st.multiselect(
-    "Select your current skills",
-    [
-        "Python", "Java", "C++", "HTML", "CSS", "JavaScript",
-        "Git", "GitHub", "SQL", "APIs", "OOPS",
-        "DBMS", "OS Basics", "Problem Solving", "Communication"
-    ]
-)
+interest = st.selectbox("Primary Interest", ["Programming", "Web", "Data Science"])
 
 st.divider()
 
-# ---------------- Generate Output ----------------
+# ---------------- Generate Roadmap ----------------
 if st.button("🔍 Generate My Roadmap"):
-    completed, gaps = skill_gap_analysis(interest, known_skills)
-    week_plan = build_week_plan(interest)
+    student_info = {
+        "skill_level": "Beginner",
+        "study_hours": study_hours,
+        "gpa": gpa,
+        "stress_level": stress,
+        "communication": communication,
+        "budget": budget,
+        "interest": interest
+    }
+
+    roadmap = generate_roadmap(student_info)
 
     st.success(f"Roadmap generated for {name or 'Student'}")
 
-    # Dashboard
-    col1, col2, col3 = st.columns(3)
-    col1.metric("GPA", gpa)
-    col2.metric("Study Hours", study_hours)
-    col3.metric("Stress", stress)
+    for i, step in enumerate(roadmap, 1):
+        st.write(f"{i}. {step}")
 
-    tab1, tab2, tab3, tab4 = st.tabs(
-        ["📊 Skill Gap", "🧭 Roadmap", "🗓️ 4-Week Plan", "🧪 Projects"]
-    )
+st.divider()
 
-    # -------- Skill Gap --------
-    with tab1:
-        st.subheader("✅ Skills You Have")
-        if completed:
-            for cat, skills in completed.items():
-                st.write(f"**{cat}**")
-                for s in skills:
-                    st.write(f"🟢 {s}")
-        else:
-            st.warning("No matching skills yet.")
+# =================================================================
+# 🔹 ADDITIONAL OPTIONAL FEATURE: SKILL ANALYSIS
+# =================================================================
 
-        st.markdown("---")
+st.header("🧩 Skill Analysis (Optional)")
+st.caption("Explore job roles and identify what you need to learn")
 
-        st.subheader("❌ Skills You Need to Learn")
-        for cat, skills in gaps.items():
-            with st.expander(cat, expanded=True):
-                for s in skills:
-                    st.write(f"🔴 {s}")
+job_choice = st.selectbox(
+    "Choose a job role to explore",
+    list(JOB_SKILL_ANALYSIS.keys())
+)
 
-    # -------- Roadmap --------
-    with tab2:
-        st.write("### 🎯 Focus Areas")
-        st.write(f"- Build strong foundation in **{interest}**")
-        if stress == "High":
-            st.write("- Manage stress with structured daily routine")
-        if communication == "Poor":
-            st.write("- Improve communication skills weekly")
+job_info = JOB_SKILL_ANALYSIS[job_choice]
 
-    # -------- Week Plan --------
-    with tab3:
-        for w in week_plan:
-            with st.expander(w["title"], expanded=True):
-                for p in w["points"]:
-                    st.write(f"• {p}")
+# Show skills, projects, resources side-by-side
+col1, col2, col3 = st.columns(3)
 
-    # -------- Projects --------
-    with tab4:
-        st.write("### 🚀 Suggested Projects")
-        if interest == "Software Developer":
-            st.write("- Student Management System")
-            st.write("- Task Tracker App")
-            st.write("- Portfolio Website")
-        elif interest == "Data Science":
-            st.write("- Student Performance Analysis")
-            st.write("- Sales Prediction Model")
-        else:
-            st.write("- Personal Portfolio Website")
-            st.write("- CRUD Web Application")
+with col1:
+    st.subheader("🧠 Skills Required")
+    for s in job_info["skills"]:
+        st.write("•", s)
 
-    # -------- Download --------
-    roadmap_text = f"""
-Personalized Skill Roadmap for {name}
-Interest: {interest}
-Generated on: {date.today()}
+with col2:
+    st.subheader("🧪 Projects")
+    for p in job_info["projects"]:
+        st.write("•", p)
 
-Skills Completed:
-{completed}
+with col3:
+    st.subheader("📚 Resources")
+    for r in job_info["resources"]:
+        st.write("•", r)
 
-Skill Gaps:
-{gaps}
-"""
-    st.download_button(
-        "⬇️ Download Roadmap",
-        roadmap_text,
-        file_name="skill_roadmap.txt"
-    )
+# Ask user skills
+st.divider()
+st.subheader("🎓 Your Current Skills")
+
+known_skills = st.multiselect(
+    "Select skills you already know",
+    job_info["skills"]
+)
+
+# Skill gap analysis
+known, missing = compute_skill_gap(job_info["skills"], known_skills)
+
+st.subheader("📊 Skill Gap Analysis")
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("### ✅ Skills You Have")
+    if known:
+        for s in known:
+            st.success(s)
+    else:
+        st.warning("No skills selected")
+
+with col2:
+    st.markdown("### ❌ Skills You Need to Learn")
+    for s in missing:
+        st.error(s)
+
+# Learning order
+st.subheader("🛣️ Recommended Learning Order")
+for i, skill in enumerate(missing, 1):
+    st.write(f"{i}. Learn **{skill}**")
 
 st.divider()
 
 with st.expander("📊 Dataset Preview"):
     st.dataframe(data)
 
-st.caption("Mini Project | Personalized Student Skill Roadmap with Skill Gap Analysis")
+st.caption("Mini Project | Personalized Student Skill Roadmap + Skill Analysis Module")
