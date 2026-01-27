@@ -140,6 +140,25 @@ JOB_SKILL_ANALYSIS = {
             "React Official Docs"
         ]
     },
+    "Backend Developer": {
+        "skills": [
+            "Node.js / Python / Java",
+            "Databases (SQL/NoSQL)",
+            "APIs / RESTful Services",
+            "Git & GitHub",
+            "Authentication & Security"
+        ],
+        "projects": [
+            "REST API Project",
+            "E-commerce Backend",
+            "Blog Platform Backend"
+        ],
+        "resources": [
+            "Udemy Backend Courses",
+            "YouTube - Tech With Tim / Traversy Media",
+            "MongoDB University"
+        ]
+    },
     "Data Scientist": {
         "skills": [
             "Python",
@@ -157,6 +176,196 @@ JOB_SKILL_ANALYSIS = {
             "Kaggle Learn",
             "Krish Naik (YouTube)",
             "Coursera ML (Audit Mode)"
+        ]
+    },
+    "Machine Learning Engineer": {
+        "skills": [
+            "Python",
+            "Linear Algebra & Statistics",
+            "Scikit-learn / TensorFlow / PyTorch",
+            "Data Preprocessing",
+            "Model Deployment"
+        ],
+        "projects": [
+            "Predictive Analytics Model",
+            "Image Classification Project",
+            "Recommendation System"
+        ],
+        "resources": [
+            "Fast.ai Courses",
+            "DeepLearning.ai (Coursera)",
+            "YouTube - Sentdex / Krish Naik"
+        ]
+    },
+    "DevOps Engineer": {
+        "skills": [
+            "Linux / Shell Scripting",
+            "CI/CD (Jenkins/GitHub Actions)",
+            "Docker / Kubernetes",
+            "Cloud Platforms (AWS / GCP / Azure)",
+            "Monitoring & Logging"
+        ],
+        "projects": [
+            "CI/CD Pipeline Setup",
+            "Dockerized Application Deployment",
+            "Cloud Infrastructure Project"
+        ],
+        "resources": [
+            "Linux Academy / A Cloud Guru",
+            "YouTube - TechWorld with Nana",
+            "Official Docker & Kubernetes Docs"
+        ]
+    },
+    "UI/UX Designer": {
+        "skills": [
+            "Figma / Adobe XD",
+            "Wireframing & Prototyping",
+            "User Research & Testing",
+            "Responsive Design Principles",
+            "Portfolio Creation"
+        ],
+        "projects": [
+            "Mobile App Wireframes",
+            "Website Redesign Project",
+            "Interactive Prototype"
+        ],
+        "resources": [
+            "Figma Learn Tutorials",
+            "Coursera UI/UX Courses",
+            "YouTube - DesignCourse / CharliMarieTV"
+        ]
+    },
+    "Cybersecurity Analyst": {
+        "skills": [
+            "Networking Basics",
+            "Linux & Windows Security",
+            "Penetration Testing",
+            "Firewalls & IDS/IPS",
+            "Security Tools (Wireshark, Nmap)"
+        ],
+        "projects": [
+            "Vulnerability Assessment",
+            "Phishing Simulation",
+            "Secure Web Application Setup"
+        ],
+        "resources": [
+            "TryHackMe / Hack The Box",
+            "Cybrary Courses",
+            "YouTube - NetworkChuck / The Cyber Mentor"
+        ]
+    },
+    "Mobile App Developer": {
+        "skills": [
+            "Java / Kotlin / Swift / Flutter",
+            "UI/UX for Mobile",
+            "APIs & Backend Integration",
+            "App Deployment (Play Store / App Store)",
+            "Debugging & Testing"
+        ],
+        "projects": [
+            "Todo App",
+            "Weather Forecast App",
+            "E-commerce Mobile App"
+        ],
+        "resources": [
+            "Udemy Mobile App Courses",
+            "YouTube - CodeWithChris / The Net Ninja",
+            "Official Flutter Docs"
+        ]
+    },
+    "Cloud Engineer": {
+        "skills": [
+            "AWS / Azure / GCP",
+            "Cloud Architecture & Design",
+            "Networking & Security",
+            "CI/CD Pipelines",
+            "Infrastructure as Code (Terraform)"
+        ],
+        "projects": [
+            "Deploy Web App on Cloud",
+            "Serverless Application Project",
+            "Cloud Monitoring Setup"
+        ],
+        "resources": [
+            "AWS / Azure / GCP Official Docs",
+            "A Cloud Guru Courses",
+            "YouTube - TechWorld with Nana"
+        ]
+    },
+    "Business Analyst": {
+        "skills": [
+            "Excel / SQL / Tableau / PowerBI",
+            "Requirement Gathering",
+            "Process Modeling",
+            "Data Analysis & Reporting",
+            "Communication & Presentation"
+        ],
+        "projects": [
+            "Sales Dashboard",
+            "Customer Analysis Report",
+            "Process Optimization Project"
+        ],
+        "resources": [
+            "Coursera Business Analytics",
+            "Udemy SQL / Tableau Courses",
+            "YouTube - Analytics University"
+        ]
+    },
+    "Digital Marketing Specialist": {
+        "skills": [
+            "SEO / SEM",
+            "Google Analytics",
+            "Content Creation",
+            "Social Media Marketing",
+            "Email Marketing"
+        ],
+        "projects": [
+            "SEO Campaign Project",
+            "Social Media Ad Campaign",
+            "Email Marketing Automation"
+        ],
+        "resources": [
+            "Google Digital Garage",
+            "HubSpot Academy",
+            "YouTube - Neil Patel / Brian Dean"
+        ]
+    },
+    "Blockchain Developer": {
+        "skills": [
+            "Solidity / Ethereum",
+            "Smart Contracts",
+            "Web3.js / Ethers.js",
+            "Blockchain Architecture",
+            "Cryptography Basics"
+        ],
+        "projects": [
+            "Smart Contract Deployment",
+            "NFT Minting Platform",
+            "Decentralized App (DApp)"
+        ],
+        "resources": [
+            "CryptoZombies.io",
+            "Coursera Blockchain Courses",
+            "YouTube - Dapp University"
+        ]
+    },
+    "AI Researcher": {
+        "skills": [
+            "Python / R",
+            "Mathematics (Linear Algebra, Probability)",
+            "Deep Learning",
+            "NLP / Computer Vision",
+            "Research Paper Reading & Implementation"
+        ],
+        "projects": [
+            "Image Captioning Model",
+            "Text Summarization Model",
+            "Custom Neural Network Research"
+        ],
+        "resources": [
+            "arXiv Papers",
+            "DeepLearning.ai",
+            "YouTube - Yannic Kilcher / Two Minute Papers"
         ]
     }
 }
@@ -330,3 +539,4 @@ with st.expander("📊 Sample Student Dataset"):
     st.dataframe(data)
 
 st.caption("Mini Project | Personalized Student Skill Roadmap + Skill Gap Analysis")
+
