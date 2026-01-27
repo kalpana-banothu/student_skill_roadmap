@@ -34,6 +34,7 @@ def get_similar_students(df, info):
     return f
 
 def build_week_plan(interest, skill_level, budget_level):
+    """A structured 4-week roadmap (generic but clean)."""
     free_note = "Use free resources (YouTube/NPTEL/free Coursera audits)." if budget_level=="Low" else "Consider 1 paid course + mentorship for speed."
     if skill_level=="Beginner":
         project = "Mini project: build a basic end-to-end demo"
@@ -51,19 +52,17 @@ def build_week_plan(interest, skill_level, budget_level):
 def generate_structured_roadmap(info, df):
     """Return a rich roadmap object (not just flat strings)."""
     steps, risks, habits, goals = [], [], [], []
-
     sim = get_similar_students(df, info)
     sim_note = None
-    if len(sim) >= 1:
+    if len(sim) >= 5:
         avg_gpa = sim["gpa"].mean() if "gpa" in sim.columns else None
         avg_study = sim["study_hours"].mean() if "study_hours" in sim.columns else None
-        sim_note = f"Based on **{len(sim)} similar students**:"
-        if avg_gpa is not None:
-            sim_note += f" average GPA is **{avg_gpa:.2f}**"
-        if avg_study is not None:
-            sim_note += f" and average study hours is **{avg_study:.1f}/day**."
+        if avg_gpa is not None and avg_study is not None:
+            sim_note = f"Based on **{len(sim)} similar students** (same year/branch/interest/skill), average GPA is **{avg_gpa:.2f}** and average study hours is **{avg_study:.1f}/day**."
+        else:
+            sim_note = f"Not enough similar-student rows for strong stats (found {len(sim)}). Using rule-based roadmap."
     else:
-        sim_note = "No similar students found. Using rule-based roadmap."
+        sim_note = f"Not enough similar-student rows for strong stats (found {len(sim)}). Using rule-based roadmap."
 
     # Core goals
     goals.append(f"Build a clear learning path in **{info['interest']}**.")
@@ -172,6 +171,7 @@ def roadmap_to_markdown(name, info, roadmap):
             lines.append(f"## {section}")
             for i in items: lines.append(f"- {s(i)}")
             lines.append("")
+    # 4-Week plan
     lines.append("## 4-Week Plan")
     for w in roadmap.get("week_plan", []):
         lines.append(f"### {s(w.get('title',''))}")
@@ -242,7 +242,8 @@ if st.button("🔍 Generate My Roadmap"):
     st.progress(readiness/100)
     st.caption("This score is a UI indicator (not an official assessment).")
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["🧭 Roadmap","🗓️ 4-Week Plan","🧪 Projects","📚 Resources","🧩 Skill Analysis"])
+    # Tabs for roadmap
+    tab1, tab2, tab3, tab4 = st.tabs(["🧭 Roadmap","🗓️ 4-Week Plan","🧪 Projects","📚 Resources"])
     with tab1:
         st.info(roadmap["similar_note"])
         st.subheader("🎯 Goals")
@@ -265,33 +266,6 @@ if st.button("🔍 Generate My Roadmap"):
     with tab4:
         st.subheader("Recommended Resources")
         for r in roadmap["resources"]: st.write(f"📌 {r}")
-    with tab5:
-        st.header("🧩 Skill Analysis (Optional)")
-        job_choice = st.selectbox("Choose a Job Role", list(JOB_SKILL_ANALYSIS.keys()))
-        job_info = JOB_SKILL_ANALYSIS[job_choice]
-        c1,c2,c3 = st.columns(3)
-        with c1:
-            st.subheader("🧠 Skills Required")
-            for s_ in job_info["skills"]: st.write("•",s_)
-        with c2:
-            st.subheader("🧪 Projects")
-            for p in job_info["projects"]: st.write("•",p)
-        with c3:
-            st.subheader("📚 Resources")
-            for r in job_info["resources"]: st.write("•",r)
-        st.subheader("🎓 Your Current Skills")
-        known_skills = st.multiselect("Select skills you already know", job_info["skills"])
-        known, missing = compute_skill_gap(job_info["skills"], known_skills)
-        st.subheader("📊 Skill Gap Analysis")
-        col1,col2 = st.columns(2)
-        with col1:
-            st.markdown("### ✅ Skills You Have")
-            for s_ in known: st.success(s_) if known else st.warning("No skills selected")
-        with col2:
-            st.markdown("### ❌ Skills You Need to Learn")
-            for s_ in missing: st.error(s_)
-        st.subheader("🛣️ Recommended Learning Order")
-        for i,s_ in enumerate(missing,1): st.write(f"{i}. Learn **{s_}**")
 
     # Download markdown
     md = roadmap_to_markdown(name, student_info, roadmap)
@@ -300,6 +274,53 @@ if st.button("🔍 Generate My Roadmap"):
                        file_name=f"roadmap_{(name or 'student').replace(' ','_').lower()}.md",
                        mime="text/markdown")
 
+# ---------------- Skill Analysis Section (Standalone) ----------------
+st.divider()
+st.header("🧩 Skill Analysis (Optional / Standalone)")
+
+job_choice = st.selectbox("Choose a Job Role", list(JOB_SKILL_ANALYSIS.keys()), key="skill_analysis_role")
+job_info = JOB_SKILL_ANALYSIS[job_choice]
+
+st.subheader("🧠 Required Skills")
+st.write(", ".join(job_info["skills"]))
+
+st.subheader("🧪 Sample Projects")
+for p in job_info["projects"]:
+    st.write(f"• {p}")
+    
+st.subheader("📚 Recommended Resources")
+for r in job_info["resources"]:
+    st.write(f"• {r}")
+
+st.subheader("🎓 Your Current Skills")
+known_skills = st.multiselect("Select skills you already know", job_info["skills"], key="skill_analysis_known")
+
+known, missing = compute_skill_gap(job_info["skills"], known_skills)
+
+st.subheader("📊 Skill Gap Analysis")
+col1, col2 = st.columns(2)
+with col1:
+    st.markdown("### ✅ Skills You Have")
+    if known:
+        for s in known:
+            st.success(s)
+    else:
+        st.warning("You have not selected any skills yet.")
+        
+with col2:
+    st.markdown("### ❌ Skills You Need to Learn")
+    if missing:
+        for s in missing:
+            st.error(s)
+    else:
+        st.info("You already know all required skills!")
+
+if missing:
+    st.subheader("🛣️ Recommended Learning Order")
+    for i, s in enumerate(missing, 1):
+        st.write(f"{i}. Learn **{s}**")
+
+# ---------------- Dataset Preview ----------------
 st.divider()
 with st.expander("📊 Sample Student Dataset (Preview)", expanded=False):
     st.dataframe(data, use_container_width=True)
