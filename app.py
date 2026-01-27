@@ -295,33 +295,31 @@ for r in job_info["resources"]:
 st.subheader("🎓 Your Current Skills")
 known_skills = st.multiselect("Select skills you already know", job_info["skills"], key="skill_analysis_known")
 
-known, missing = compute_skill_gap(job_info["skills"], known_skills)
+# Only show skill gap analysis if user has selected at least one known skill
+if known_skills:
+    known, missing = compute_skill_gap(job_info["skills"], known_skills)
 
-st.subheader("📊 Skill Gap Analysis")
-col1, col2 = st.columns(2)
-with col1:
-    st.markdown("### ✅ Skills You Have")
-    if known:
+    st.subheader("📊 Skill Gap Analysis")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### ✅ Skills You Have")
         for s in known:
             st.success(s)
-    else:
-        st.warning("You have not selected any skills yet.")
         
-with col2:
-    st.markdown("### ❌ Skills You Need to Learn")
-    if missing:
+    with col2:
+        st.markdown("### ❌ Skills You Need to Learn")
         for s in missing:
             st.error(s)
-    else:
-        st.info("You already know all required skills!")
 
-if missing:
-    st.subheader("🛣️ Recommended Learning Order")
-    for i, s in enumerate(missing, 1):
-        st.write(f"{i}. Learn **{s}**")
+    if missing:
+        st.subheader("🛣️ Recommended Learning Order")
+        for i, s in enumerate(missing, 1):
+            st.write(f"{i}. Learn **{s}**")
+
 
 # ---------------- Dataset Preview ----------------
 st.divider()
 with st.expander("📊 Sample Student Dataset (Preview)", expanded=False):
     st.dataframe(data, use_container_width=True)
 st.caption("Mini Project | Student Skill Roadmap | Streamlit Web App")
+
