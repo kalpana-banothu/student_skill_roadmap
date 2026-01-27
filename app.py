@@ -16,7 +16,59 @@ data = load_data()
 def safe_unique(df, col, fallback):
     return sorted(df[col].dropna().unique()) if col in df.columns else fallback
 
+def normalize_yes_no(x):
+    if isinstance(x, str):
+        x = x.strip().lower()
+        if x in ("yes", "y", "true", "1"):
+            return "Yes"
+    return "No"
+
 # ---------------- Roadmap Logic ----------------
+def build_week_plan(interest, skill_level, budget_level):
+    free_note = "Use free resources (YouTube/NPTEL/free Coursera audits)." if budget_level == "Low" else "Consider 1 paid course + mentorship for speed."
+    if skill_level == "Beginner":
+        project = "Mini project: build a basic end-to-end demo"
+        depth = "Focus on fundamentals + consistent practice"
+    else:
+        project = "Project: build a portfolio-grade real-world application"
+        depth = "Focus on advanced concepts + real datasets + deployment"
+    return [
+        {
+            "title": "Week 1 — Foundation",
+            "bullets": [
+                f"{depth} in **{interest}** (core concepts).",
+                "Set up tools (GitHub, editor, notes).",
+                "Daily practice: 45–60 mins.",
+                free_note,
+            ],
+        },
+        {
+            "title": "Week 2 — Skill Building",
+            "bullets": [
+                "Solve 10–15 practice problems / exercises.",
+                "Start a structured course + take notes.",
+                "Build 1 small component (feature/module) daily.",
+            ],
+        },
+        {
+            "title": "Week 3 — Projects & Proof",
+            "bullets": [
+                project,
+                "Add README + screenshots + clear steps.",
+                "Push code daily to GitHub (commit streak).",
+            ],
+        },
+        {
+            "title": "Week 4 — Career Readiness",
+            "bullets": [
+                "Resume: add project + skills + links.",
+                "Mock interview / presentations (2 sessions).",
+                "Polish project + deploy (if possible).",
+                "Plan next month based on gaps.",
+            ],
+        },
+    ]
+
 def generate_roadmap(info):
     steps = []
 
@@ -43,8 +95,7 @@ def generate_roadmap(info):
 
     return steps
 
-# ---------------- ADDITIONAL FEATURE ----------------
-# -------- Job-based Skill Analysis Data --------
+# ---------------- Skill Gap Analysis ----------------
 JOB_SKILL_ANALYSIS = {
     "Software Developer": {
         "skills": [
@@ -69,7 +120,6 @@ JOB_SKILL_ANALYSIS = {
             "GitHub – Open Source Projects"
         ]
     },
-
     "Frontend Developer": {
         "skills": [
             "HTML",
@@ -90,7 +140,6 @@ JOB_SKILL_ANALYSIS = {
             "React Official Docs"
         ]
     },
-
     "Data Scientist": {
         "skills": [
             "Python",
@@ -115,18 +164,16 @@ JOB_SKILL_ANALYSIS = {
 def compute_skill_gap(required_skills, known_skills):
     known = []
     missing = []
-
     for s in required_skills:
         if s in known_skills:
             known.append(s)
         else:
             missing.append(s)
-
     return known, missing
 
 # ---------------- UI ----------------
 st.title("🎓 Personalized Student Skill Roadmap")
-st.caption("Main roadmap system with additional Skill Analysis option")
+st.caption("Student roadmap with week-wise plan and optional Skill Analysis")
 st.divider()
 
 # ---------------- Inputs ----------------
@@ -136,106 +183,150 @@ name = st.text_input("Student Name")
 year = st.selectbox("Year", [1, 2, 3, 4])
 branch = st.selectbox("Branch", ["CSE", "IT", "ECE", "EEE"])
 gpa = st.slider("GPA", 0.0, 10.0, 7.0, 0.1)
-study_hours = st.slider("Study Hours / Day", 0, 12, 3)
-hostel = st.selectbox("Hostel", ["Yes", "No"])
-stress = st.selectbox("Stress Level", ["Low", "Medium", "High"])
-confusion = st.selectbox("Confusion Level", ["Low", "Medium", "High"])
-communication = st.selectbox("Communication Skill", ["Poor", "Average", "Good"])
-budget = st.selectbox("Budget", ["Low", "Medium", "High"])
+study_hours = st.slider("Daily Study Hours", 0, 12, 3)
+failures = st.number_input("Number of Failures", min_value=0, max_value=10, value=0)
+hostel = st.selectbox("Hostel?", ["Yes", "No"])
+sleep_hours = st.slider("Daily Sleep Hours", 0, 12, 6)
+family_support = st.selectbox("Family Support Level", ["Low", "Medium", "High"])
 interest = st.selectbox("Primary Interest", ["Programming", "Web", "Data Science"])
+budget = st.selectbox("Budget Level", ["Low", "Medium", "High"])
+skill_level = st.selectbox("Skill Level", ["Beginner", "Intermediate", "Advanced"])
+stress_level = st.selectbox("Stress Level", ["Low", "Medium", "High"])
+confusion_level = st.selectbox("Confusion Level", ["Low", "Medium", "High"])
+communication = st.selectbox("Communication Level", ["Poor", "Average", "Good"])
 
 st.divider()
 
 # ---------------- Generate Roadmap ----------------
 if st.button("🔍 Generate My Roadmap"):
     student_info = {
-        "skill_level": "Beginner",
-        "study_hours": study_hours,
-        "gpa": gpa,
-        "stress_level": stress,
-        "communication": communication,
+        "year": year,
+        "branch": branch,
+        "gpa": float(gpa),
+        "study_hours": int(study_hours),
+        "failures": int(failures),
+        "hostel": hostel,
+        "sleep_hours": int(sleep_hours),
+        "family_support": family_support,
+        "interest": interest,
         "budget": budget,
-        "interest": interest
+        "skill_level": skill_level,
+        "stress_level": stress_level,
+        "confusion_level": confusion_level,
+        "communication": communication,
     }
 
     roadmap = generate_roadmap(student_info)
 
-    st.success(f"Roadmap generated for {name or 'Student'}")
+    st.success(f"✅ Roadmap Generated for {name or 'Student'}")
 
-    for i, step in enumerate(roadmap, 1):
-        st.write(f"{i}. {step}")
+    # Quick dashboard metrics
+    col1, col2, col3 = st.columns(3)
+    col1.metric("GPA", f"{gpa:.1f}")
+    col2.metric("Study Hours/day", f"{study_hours}")
+    col3.metric("Sleep Hours", f"{sleep_hours}")
+
+    # Simple readiness score
+    readiness = 0
+    readiness += 30 if gpa >= 7 else 20 if gpa >= 6 else 10
+    readiness += 25 if study_hours >= 4 else 15 if study_hours >= 3 else 8
+    readiness += 20 if stress_level != "High" else 8
+    readiness += 15 if confusion_level != "High" else 8
+    readiness += 10 if communication in ("Average", "Good") else 5
+    readiness = min(readiness, 100)
+    st.write("### 📈 Readiness Score")
+    st.progress(readiness / 100)
+    st.caption("UI indicator only, not an official assessment")
+
+    # Tabs
+    tab1, tab2, tab3, tab4 = st.tabs(["🧭 Roadmap", "🗓️ 4-Week Plan", "🧪 Projects", "📚 Resources"])
+
+    with tab1:
+        st.subheader("✅ Action Steps")
+        for i, step in enumerate(roadmap, 1):
+            st.write(f"{i}. {step}")
+
+    with tab2:
+        week_plan = build_week_plan(interest, skill_level, budget)
+        for w in week_plan:
+            with st.expander(w["title"], expanded=True):
+                for b in w["bullets"]:
+                    st.write(f"• {b}")
+
+    with tab3:
+        st.subheader("Suggested Projects")
+        project_list = ["Sample project 1", "Sample project 2"]  # placeholder
+        for p in project_list:
+            st.write(f"🚀 {p}")
+
+    with tab4:
+        st.subheader("Recommended Resources")
+        resource_list = ["Sample resource 1", "Sample resource 2"]  # placeholder
+        for r in resource_list:
+            st.write(f"📌 {r}")
 
 st.divider()
 
 # =================================================================
-# 🔹 ADDITIONAL OPTIONAL FEATURE: SKILL ANALYSIS
+# 🔹 OPTIONAL FEATURE: SKILL GAP ANALYSIS
 # =================================================================
-
 st.header("🧩 Skill Analysis (Optional)")
-st.caption("Explore job roles and identify what you need to learn")
+st.caption("Select a job role and see the skills, projects, resources and gaps")
 
 job_choice = st.selectbox(
     "Choose a job role to explore",
-    list(JOB_SKILL_ANALYSIS.keys())
+    ["-- Select Job Role --"] + list(JOB_SKILL_ANALYSIS.keys())
 )
 
-job_info = JOB_SKILL_ANALYSIS[job_choice]
+if job_choice != "-- Select Job Role --":
+    job_info = JOB_SKILL_ANALYSIS[job_choice]
 
-# Show skills, projects, resources side-by-side
-col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.subheader("🧠 Skills Required")
+        for s in job_info["skills"]:
+            st.write("•", s)
+    with col2:
+        st.subheader("🧪 Projects")
+        for p in job_info["projects"]:
+            st.write("•", p)
+    with col3:
+        st.subheader("📚 Resources")
+        for r in job_info["resources"]:
+            st.write("•", r)
 
-with col1:
-    st.subheader("🧠 Skills Required")
-    for s in job_info["skills"]:
-        st.write("•", s)
+    st.divider()
+    st.subheader("🎓 Your Current Skills")
+    known_skills = st.multiselect("Select skills you already know", job_info["skills"])
 
-with col2:
-    st.subheader("🧪 Projects")
-    for p in job_info["projects"]:
-        st.write("•", p)
+    known, missing = compute_skill_gap(job_info["skills"], known_skills)
 
-with col3:
-    st.subheader("📚 Resources")
-    for r in job_info["resources"]:
-        st.write("•", r)
+    st.subheader("📊 Skill Gap Analysis")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### ✅ Skills You Have")
+        if known:
+            for s in known:
+                st.success(s)
+        else:
+            st.warning("No skills selected")
+    with col2:
+        st.markdown("### ❌ Skills You Need to Learn")
+        if missing:
+            for s in missing:
+                st.error(s)
+        else:
+            st.success("You already know all required skills 🎉")
 
-# Ask user skills
-st.divider()
-st.subheader("🎓 Your Current Skills")
-
-known_skills = st.multiselect(
-    "Select skills you already know",
-    job_info["skills"]
-)
-
-# Skill gap analysis
-known, missing = compute_skill_gap(job_info["skills"], known_skills)
-
-st.subheader("📊 Skill Gap Analysis")
-
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("### ✅ Skills You Have")
-    if known:
-        for s in known:
-            st.success(s)
-    else:
-        st.warning("No skills selected")
-
-with col2:
-    st.markdown("### ❌ Skills You Need to Learn")
-    for s in missing:
-        st.error(s)
-
-# Learning order
-st.subheader("🛣️ Recommended Learning Order")
-for i, skill in enumerate(missing, 1):
-    st.write(f"{i}. Learn **{skill}**")
+    if missing:
+        st.subheader("🛣️ Recommended Learning Order")
+        for i, skill in enumerate(missing, 1):
+            st.write(f"{i}. Learn **{skill}**")
+else:
+    st.info("👆 Please select a job role to see skills, projects, and skill gap analysis.")
 
 st.divider()
-
-with st.expander("📊 Dataset Preview"):
+with st.expander("📊 Sample Student Dataset"):
     st.dataframe(data)
 
-st.caption("Mini Project | Personalized Student Skill Roadmap + Skill Analysis Module")
+st.caption("Mini Project | Personalized Student Skill Roadmap + Skill Gap Analysis")
