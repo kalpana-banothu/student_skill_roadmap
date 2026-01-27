@@ -278,43 +278,47 @@ if st.button("🔍 Generate My Roadmap"):
 st.divider()
 st.header("🧩 Skill Analysis (Optional / Standalone)")
 
-job_choice = st.selectbox("Choose a Job Role", list(JOB_SKILL_ANALYSIS.keys()), key="skill_analysis_role")
-job_info = JOB_SKILL_ANALYSIS[job_choice]
+# User selects a job role first
+job_choice = st.selectbox("Choose a Job Role", ["Select a role"] + list(JOB_SKILL_ANALYSIS.keys()), key="skill_analysis_role")
 
-st.subheader("🧠 Required Skills")
-st.write(", ".join(job_info["skills"]))
+if job_choice != "Select a role":
+    job_info = JOB_SKILL_ANALYSIS[job_choice]
 
-st.subheader("🧪 Sample Projects")
-for p in job_info["projects"]:
-    st.write(f"• {p}")
-    
-st.subheader("📚 Recommended Resources")
-for r in job_info["resources"]:
-    st.write(f"• {r}")
+    st.subheader("🧠 Required Skills")
+    st.write(", ".join(job_info["skills"]))
 
-st.subheader("🎓 Your Current Skills")
-known_skills = st.multiselect("Select skills you already know", job_info["skills"], key="skill_analysis_known")
+    st.subheader("🧪 Sample Projects")
+    for p in job_info["projects"]:
+        st.write(f"• {p}")
 
-# Only show skill gap analysis if user has selected at least one known skill
-if known_skills:
-    known, missing = compute_skill_gap(job_info["skills"], known_skills)
+    st.subheader("📚 Recommended Resources")
+    for r in job_info["resources"]:
+        st.write(f"• {r}")
 
-    st.subheader("📊 Skill Gap Analysis")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.markdown("### ✅ Skills You Have")
-        for s in known:
-            st.success(s)
-        
-    with col2:
-        st.markdown("### ❌ Skills You Need to Learn")
-        for s in missing:
-            st.error(s)
+    st.subheader("🎓 Your Current Skills")
+    known_skills = st.multiselect("Select skills you already know", job_info["skills"], key="skill_analysis_known")
 
-    if missing:
-        st.subheader("🛣️ Recommended Learning Order")
-        for i, s in enumerate(missing, 1):
-            st.write(f"{i}. Learn **{s}**")
+    # Only show skill gap analysis if user selects known skills
+    if known_skills:
+        known, missing = compute_skill_gap(job_info["skills"], known_skills)
+
+        st.subheader("📊 Skill Gap Analysis")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("### ✅ Skills You Have")
+            for s in known:
+                st.success(s)
+
+        with col2:
+            st.markdown("### ❌ Skills You Need to Learn")
+            for s in missing:
+                st.error(s)
+
+        if missing:
+            st.subheader("🛣️ Recommended Learning Order")
+            for i, s in enumerate(missing, 1):
+                st.write(f"{i}. Learn **{s}**")
+
 
 
 # ---------------- Dataset Preview ----------------
@@ -322,4 +326,5 @@ st.divider()
 with st.expander("📊 Sample Student Dataset (Preview)", expanded=False):
     st.dataframe(data, use_container_width=True)
 st.caption("Mini Project | Student Skill Roadmap | Streamlit Web App")
+
 
