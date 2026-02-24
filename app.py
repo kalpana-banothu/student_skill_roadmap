@@ -1,4 +1,9 @@
 import streamlit as st
+
+st.title("Student Skill Roadmap")
+
+st.image("vitaly-gariev-Sc2iIlwScic-unsplash.jpg", use_column_width=True)
+import streamlit as st
 import pandas as pd
 from datetime import date
 
@@ -572,6 +577,7 @@ st.divider()
 with st.expander("📊 Sample Student Dataset (Preview)", expanded=False):
     st.dataframe(data, use_container_width=True)
 st.caption("Mini Project | Student Skill Roadmap | Streamlit Web App")
+
 
 
 
