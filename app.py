@@ -590,6 +590,9 @@ elif st.session_state.page == "roadmap":
     with st.expander("📊 Sample Student Dataset (Preview)", expanded=False):
         st.dataframe(data, use_container_width=True)
     st.caption("Mini Project | Student Skill Roadmap | Streamlit Web App")
+    if st.button("⬅ Back to Dashboard"):
+        st.session_state.page = "home"
+        st.rerun()
 
 
 
