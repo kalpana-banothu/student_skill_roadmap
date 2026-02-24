@@ -17,7 +17,6 @@ if st.session_state.page == "home":
 
 # ---------------- ROADMAP PAGE ----------------
 elif st.session_state.page == "roadmap":
-import streamlit as st
 import pandas as pd
 from datetime import date
 
@@ -591,6 +590,7 @@ st.divider()
 with st.expander("📊 Sample Student Dataset (Preview)", expanded=False):
     st.dataframe(data, use_container_width=True)
 st.caption("Mini Project | Student Skill Roadmap | Streamlit Web App")
+
 
 
 
