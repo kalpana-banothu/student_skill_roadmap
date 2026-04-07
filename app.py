@@ -479,6 +479,14 @@ with col_l2:
 with col_l3:
     family_support = st.selectbox("Family Support Level", ["Low","Medium","High"])
 
+st.divider()
+
+# THIS LINE MUST NOT HAVE EXTRA SPACES AT THE START
+if st.button("🔍 Generate My Roadmap"):
+    # Everything inside the button must be indented exactly 4 spaces
+    st.write(f"Generating roadmap for {name}...")
+    # call your roadmap function here
+
 # --- Row 4: Skills & Mental State ---
 col_s1, col_s2, col_s3 = st.columns(3)
 with col_s1:
