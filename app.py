@@ -450,14 +450,6 @@ elif st.session_state.page == "roadmap":
     st.divider()
     
     # -------- User Input --------
-     years = safe_unique(data, "year", [1,2,3,4])
-    branches = safe_unique(data, "branch", ["CSE","IT","ECE","EEE"])
-    interests = safe_unique(data, "interest", ["Programming","Web","Data Science"])
-    budgets = safe_unique(data, "budget_level", ["Low","Medium","High"])
-    skill_levels = safe_unique(data, "skill_level", ["Beginner","Intermediate","Advanced"])
-    stress_levels = safe_unique(data, "stress_level", ["Low","Medium","High"])
-    conf_levels = safe_unique(data, "confusion_level", ["Low","Medium","High"])
-    comm_levels = safe_unique(data, "communication_level", ["Poor","Average","Good"])
     
     st.header("📋 Enter Your Details")
     name = st.text_input("Student Name", "")
