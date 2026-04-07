@@ -450,32 +450,31 @@ elif st.session_state.page == "roadmap":
     st.divider()
     
     # -------- User Input --------
-    years = safe_unique(data, "year", [1,2,3,4])
-    branches = safe_unique(data, "branch", ["CSE","IT","ECE","EEE"])
-    interests = safe_unique(data, "interest", ["Programming","Web","Data Science"])
-    budgets = safe_unique(data, "budget_level", ["Low","Medium","High"])
-    skill_levels = safe_unique(data, "skill_level", ["Beginner","Intermediate","Advanced"])
-    stress_levels = safe_unique(data, "stress_level", ["Low","Medium","High"])
-    conf_levels = safe_unique(data, "confusion_level", ["Low","Medium","High"])
-    comm_levels = safe_unique(data, "communication_level", ["Poor","Average","Good"])
-    
     st.header("📋 Enter Your Details")
+
+# Create two main columns for the layout
+col1, col2 = st.columns(2)
+
+with col1:
     name = st.text_input("Student Name", "")
     year = st.selectbox("Year", years)
     branch = st.selectbox("Branch", branches)
     gpa = st.slider("GPA", 0.0, 10.0, 7.0, 0.1)
     study_hours = st.slider("Daily Study Hours", 0, 12, 3)
     backlogs = st.number_input("Number of Backlogs", min_value=0, max_value=10, value=0)
-    hostel = st.selectbox("Hostel?", ["Yes","No"])
-    sleep_hours = st.slider("Daily Sleep Hours", 0,12,6)
-    family_support = st.selectbox("Family Support Level", ["Low","Medium","High"])
+    hostel = st.selectbox("Hostel?", ["Yes", "No"])
+
+with col2:
+    sleep_hours = st.slider("Daily Sleep Hours", 0, 12, 6)
+    family_support = st.selectbox("Family Support Level", ["Low", "Medium", "High"])
     interest = st.selectbox("Primary Interest", interests)
     budget = st.selectbox("Budget Level", budgets)
     skill_level = st.selectbox("Skill Level", skill_levels)
     stress_level = st.selectbox("Stress Level", stress_levels)
     confusion_level = st.selectbox("Confusion Level", conf_levels)
     communication = st.selectbox("Communication Level", comm_levels)
-    st.divider()
+
+st.divider()
     
     # -------- Generate Roadmap --------
     if st.button("🔍 Generate My Roadmap"):
