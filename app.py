@@ -465,7 +465,7 @@ elif st.session_state.page == "roadmap":
     branch = st.selectbox("Branch", branches)
     gpa = st.slider("GPA", 0.0, 10.0, 7.0, 0.1)
     study_hours = st.slider("Daily Study Hours", 0, 12, 3)
-    failures = st.number_input("Number of Failures", min_value=0, max_value=10, value=0)
+    backlogs = st.number_input("Number of Backlogs", min_value=0, max_value=10, value=0)
     hostel = st.selectbox("Hostel?", ["Yes","No"])
     sleep_hours = st.slider("Daily Sleep Hours", 0,12,6)
     family_support = st.selectbox("Family Support Level", ["Low","Medium","High"])
