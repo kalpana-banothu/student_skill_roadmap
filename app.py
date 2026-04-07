@@ -457,9 +457,9 @@ col1, col2, col3 = st.columns(3)
 with col1:
     name = st.text_input("Student Name", "")
 with col2:
-    year = st.selectbox("Year", 1,2,3,4)
+    year = st.selectbox("Year", [1,2,3,4])
 with col3:
-    branch = st.selectbox("Branch", "CSE","ECE","EEE","MECHANICAL","CSD","AIML")
+    branch = st.selectbox("Branch", ["CSE","ECE","EEE","MECHANICAL","CSD","AIML"])
 
 # --- Row 2: Academic Performance ---
 col_a1, col_a2, col_a3 = st.columns(3)
